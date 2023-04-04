@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, inject } from '@angular/core';
 import { Task } from '../..//Task';
 import { UiService } from '../../services/ui.service';
 import { Subscription } from 'rxjs';
@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 })
 export class AddTaskComponent implements OnInit {
   @Output() onAddTask: EventEmitter<Task> = new EventEmitter();
-
+  id: string;
   text: string;
   day: string;
   reminder: boolean = false;
@@ -25,6 +25,19 @@ export class AddTaskComponent implements OnInit {
 
   ngOnInit() {}
 
+  makeid(length) {
+    let result = '';
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+  }
+
   onSubmit() {
     if (!this.text) {
       alert('Please add a task!');
@@ -33,6 +46,7 @@ export class AddTaskComponent implements OnInit {
 
     const newTask = {
       text: this.text,
+      id: this.makeid(10),
       day: this.day,
       reminder: this.reminder,
     };

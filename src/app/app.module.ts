@@ -16,6 +16,11 @@ import { TaskItemComponent } from './components/task-item/task-item.component';
 import { AddTaskComponent } from './components/add-task/add-task.component';
 import { AboutComponent } from './components/about/about.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { environment } from '../environments/environment';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { AngularFireModule } from '@angular/fire/compat';
+import { FirestoreModule } from '@angular/fire/firestore';
 
 const appRoutes: Routes = [
   { path: '', component: TasksComponent },
@@ -41,7 +46,11 @@ const appRoutes: Routes = [
     MatDatepickerModule,
     MatFormFieldModule,
     MatNativeDateModule,
-    RouterModule.forRoot(appRoutes, { enableTracing: true }),
+    FirestoreModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    RouterModule.forRoot(appRoutes, { enableTracing: false }),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
   ],
 
   providers: [MatDatepickerModule],

@@ -2,6 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Task } from '../Task';
+import {
+  Firestore,
+  collection,
+  collectionData,
+  doc,
+  getDoc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+} from '@angular/fire/firestore';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -15,20 +25,37 @@ const httpOptions = {
 export class TaskService {
   private apiUrl = 'http://localhost:5000/tasks';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private firestore: Firestore) {}
+
+  async updateTask(task: Task): Promise<void> {
+    const taskRef = doc(this.firestore, `tasks/${task.id}`);
+    return setDoc(taskRef, {
+      ...task,
+    });
+  }
 
   getTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.apiUrl);
+    const taskRef = collection(this.firestore, 'tasks');
+    return collectionData(taskRef, { idField: 'id' }) as Observable<Task[]>;
   }
 
-  deleteTask(task: Task): Observable<Task> {
-    const url = `${this.apiUrl}/${task.id}`;
-    return this.http.delete<Task>(url);
+  deleteTask(id: string): Promise<void> {
+    const taskRef = doc(this.firestore, `tasks/${id}`);
+    return deleteDoc(taskRef);
   }
 
-  updateTaskReminder(task: Task): Observable<Task> {
-    const url = `${this.apiUrl}/${task.id}`;
-    return this.http.put<Task>(url, task, httpOptions);
+  async updateTaskReminder(id: string): Promise<void>  {
+    const taskRef = doc(this.firestore, `tasks/${id}`);
+    const docSnap = await getDoc(taskRef);
+    let dataToUpdate;
+    if (docSnap.exists()) {
+      const taskData = docSnap.data();
+      const reminderData = taskData['reminder']
+      dataToUpdate = { reminder: !reminderData };
+    } else {
+      console.error("No such document!");
+    }
+    return updateDoc(taskRef, dataToUpdate);
   }
 
   addTask(task: Task): Observable<Task> {

@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "todo-task-10597": {
+      "hosting": {
+        "ToDo-list": [
+          "todo-task-10597"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "todo-task-10597"
+  }
+}
